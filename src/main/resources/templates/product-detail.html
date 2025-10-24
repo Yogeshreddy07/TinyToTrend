@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details - TinyToTrend</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #ff3f6c;
+            --secondary: #282c3f;
+            --bg-light: #f5f5f6;
+            --border: #e9e9ed;
+            --white: #fff;
+            --text-dark: #282c3f;
+            --text-light: #94969f;
+            --success: #03a685;
+            --error: #ff5722;
+            --shadow: 0 2px 16px rgba(0,0,0,0.08);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: var(--bg-light);
+            font-family: 'Inter', sans-serif;
+            color: var(--text-dark);
+        }
+
+        /* ==================== NAVBAR ==================== */
+        .navbar {
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .navbar .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+        }
+        .nav-actions {
+            display: flex;
+            gap: 25px;
+        }
+        .nav-action {
+            text-decoration: none;
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 12px;
+            position: relative;
+        }
+        .nav-action i {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+        .badge {
+            position: absolute;
+            top: -5px;
+            right: -10px;
+            background: var(--primary);
+            color: var(--white);
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        /* ==================== MAIN CONTENT ==================== */
+        .product-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        
+        .breadcrumb {
+            font-size: 14px;
+            color: var(--text-light);
+            margin-bottom: 30px;
+        }
+        .breadcrumb a {
+            color: var(--text-light);
+            text-decoration: none;
+        }
+        .breadcrumb a:hover {
+            color: var(--primary);
+        }
+
+        .product-detail {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            background: var(--white);
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: var(--shadow);
+        }
+
+        /* ==================== PRODUCT IMAGE ==================== */
+        .product-image {
+            position: relative;
+        }
+        .product-image img {
+            width: 100%;
+            height: 500px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        .wishlist-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--white);
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            font-size: 20px;
+            color: var(--text-light);
+        }
+        .wishlist-btn:hover {
+            transform: scale(1.1);
+        }
+        .wishlist-btn.active {
+            color: var(--primary);
+            background: #fff0f3;
+        }
+
+        /* ==================== PRODUCT INFO ==================== */
+        .product-info {
+            padding: 10px 0;
+        }
+        .product-brand {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-light);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+        .product-name {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            line-height: 1.3;
+        }
+        .product-price {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 20px;
+        }
+        .product-description {
+            color: var(--text-light);
+            line-height: 1.6;
+            margin-bottom: 30px;
+            font-size: 15px;
+        }
+
+        .product-details {
+            border-top: 1px solid var(--border);
+            padding-top: 25px;
+            margin-bottom: 30px;
+        }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 14px;
+        }
+        .detail-label {
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+        .detail-value {
+            color: var(--text-light);
+        }
+
+        /* ==================== QUANTITY SELECTOR ==================== */
+        .quantity-section {
+            margin-bottom: 25px;
+        }
+        .quantity-label {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: block;
+        }
+        .quantity-selector {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .qty-btn {
+            background: var(--white);
+            border: 2px solid var(--border);
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.3s;
+        }
+        .qty-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        .qty-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+        .qty-display {
+            font-size: 18px;
+            font-weight: 600;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        /* ==================== ACTION BUTTONS ==================== */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .btn {
+            flex: 1;
+            padding: 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+        }
+        .btn-primary:hover {
+            background: #e63462;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255,63,108,0.3);
+        }
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-dark);
+            border: 2px solid var(--border);
+        }
+        .btn-secondary:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ==================== STOCK STATUS ==================== */
+        .stock-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        .stock-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        .stock-in {
+            background: var(--success);
+        }
+        .stock-out {
+            background: var(--error);
+        }
+
+        /* ==================== TOAST NOTIFICATION ==================== */
+        .toast {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: var(--white);
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transform: translateX(400px);
+            transition: transform 0.3s;
+            z-index: 1000;
+        }
+        .toast.show {
+            transform: translateX(0);
+        }
+        .toast-success {
+            border-left: 4px solid var(--success);
+        }
+        .toast-error {
+            border-left: 4px solid var(--error);
+        }
+
+        /* ==================== LOADING STATE ==================== */
+        .loading {
+            text-align: center;
+            padding: 100px;
+            color: var(--text-light);
+        }
+        .loading i {
+            font-size: 48px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .error-state {
+            text-align: center;
+            padding: 100px;
+            color: var(--error);
+        }
+        .error-state i {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        /* ==================== RESPONSIVE ==================== */
+        @media (max-width: 768px) {
+            .product-detail {
+                grid-template-columns: 1fr;
+                gap: 30px;
+                padding: 20px;
+            }
+            .action-buttons {
+                flex-direction: column;
+            }
+            .product-name {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container">
+            <a href="/" class="logo">TinyToTrend</a>
+            <div class="nav-actions">
+                <a href="/wishlist.html" class="nav-action">
+                    <i class="fas fa-heart"></i>
+                    <span>Wishlist</span>
+                    <span class="badge" id="wishlistCount">0</span>
+                </a>
+                <a href="/cart.html" class="nav-action">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span>Cart</span>
+                    <span class="badge" id="cartCount">0</span>
+                </a>
+                <a href="/profile.html" class="nav-action">
+                    <i class="fas fa-user"></i>
+                    <span id="userName">Profile</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="product-container">
+        <!-- Loading State -->
+        <div class="loading" id="loading">
+            <i class="fas fa-spinner"></i>
+            <h3>Loading product...</h3>
+        </div>
+
+        <!-- Error State -->
+        <div class="error-state" id="errorState" style="display: none;">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h3>Product not found</h3>
+            <p>The product you're looking for doesn't exist.</p>
+            <a href="/" style="color: var(--primary);">Go back to shop</a>
+        </div>
+
+        <!-- Product Details -->
+        <div id="productContent" style="display: none;">
+            <nav class="breadcrumb" id="breadcrumb">
+                <a href="/">Home</a> / <a href="/">Shop</a> / <span id="breadcrumbCategory">Category</span> / <span id="breadcrumbProduct">Product</span>
+            </nav>
+
+            <div class="product-detail">
+                <div class="product-image">
+                    <img id="productImage" src="" alt="">
+                    <button class="wishlist-btn" id="wishlistBtn" onclick="toggleWishlist()">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                </div>
+
+                <div class="product-info">
+                    <div class="product-brand" id="productBrand">Brand</div>
+                    <h1 class="product-name" id="productName">Product Name</h1>
+                    <div class="product-price" id="productPrice">₹0.00</div>
+                    
+                    <div class="stock-status" id="stockStatus">
+                        <div class="stock-indicator stock-in"></div>
+                        <span>In Stock</span>
+                    </div>
+
+                    <p class="product-description" id="productDescription">Product description will be displayed here.</p>
+
+                    <div class="product-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Category:</span>
+                            <span class="detail-value" id="detailCategory">-</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Gender:</span>
+                            <span class="detail-value" id="detailGender">-</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Stock:</span>
+                            <span class="detail-value" id="detailStock">-</span>
+                        </div>
+                    </div>
+
+                    <div class="quantity-section">
+                        <label class="quantity-label">Quantity:</label>
+                        <div class="quantity-selector">
+                            <button class="qty-btn" id="qtyMinus" onclick="changeQuantity(-1)">−</button>
+                            <span class="qty-display" id="quantity">1</span>
+                            <button class="qty-btn" id="qtyPlus" onclick="changeQuantity(1)">+</button>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" id="addToCartBtn" onclick="addToCart()">
+                            <i class="fas fa-shopping-bag"></i>
+                            Add to Cart
+                        </button>
+                        <button class="btn btn-secondary" onclick="window.location.href='/cart.html'">
+                            <i class="fas fa-eye"></i>
+                            View Cart
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:8080/api';
+        let currentProduct = null;
+        let currentQuantity = 1;
+        let isInWishlist = false;
+
+        // Get product ID from URL parameter
+        function getProductId() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('id');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            const productId = getProductId();
+            if (!productId) {
+                showError();
+                return;
+            }
+            
+            checkAuth();
+            loadProduct(productId);
+            updateCounts();
+        });
+
+        function checkAuth() {
+            const userName = localStorage.getItem('userName');
+            if (userName) {
+                document.getElementById('userName').textContent = userName;
+            }
+        }
+
+        async function loadProduct(productId) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/products/${productId}`);
+                
+                if (!response.ok) {
+                    throw new Error('Product not found');
+                }
+                
+                const product = await response.json();
+                currentProduct = product;
+                displayProduct(product);
+                
+                // Check if in wishlist
+                const token = localStorage.getItem('token');
+                if (token) {
+                    checkWishlistStatus(productId);
+                }
+                
+            } catch (error) {
+                console.error('Error loading product:', error);
+                showError();
+            }
+        }
+
+        function displayProduct(product) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('productContent').style.display = 'block';
+            
+            // Update breadcrumb
+            document.getElementById('breadcrumbCategory').textContent = product.category;
+            document.getElementById('breadcrumbProduct').textContent = product.name;
+            
+            // Update product info
+            document.getElementById('productImage').src = product.imageUrl || 'https://via.placeholder.com/500x500?text=No+Image';
+            document.getElementById('productImage').alt = product.name;
+            document.getElementById('productBrand').textContent = product.category.toUpperCase();
+            document.getElementById('productName').textContent = product.name;
+            document.getElementById('productPrice').textContent = `₹${product.price.toFixed(2)}`;
+            document.getElementById('productDescription').textContent = product.description;
+            
+            // Update details
+            document.getElementById('detailCategory').textContent = product.category;
+            document.getElementById('detailGender').textContent = product.genderTag;
+            document.getElementById('detailStock').textContent = `${product.stockQty} items`;
+            
+            // Update stock status
+            const stockStatus = document.getElementById('stockStatus');
+            if (product.stockQty > 0) {
+                stockStatus.innerHTML = `
+                    <div class="stock-indicator stock-in"></div>
+                    <span>In Stock (${product.stockQty} available)</span>
+                `;
+                document.getElementById('addToCartBtn').disabled = false;
+            } else {
+                stockStatus.innerHTML = `
+                    <div class="stock-indicator stock-out"></div>
+                    <span>Out of Stock</span>
+                `;
+                document.getElementById('addToCartBtn').disabled = true;
+                document.getElementById('qtyPlus').disabled = true;
+            }
+            
+            // Update page title
+            document.title = `${product.name} - TinyToTrend`;
+        }
+
+        function showError() {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('errorState').style.display = 'block';
+        }
+
+        async function checkWishlistStatus(productId) {
+            const token = localStorage.getItem('token');
+            if (!token) return;
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/wishlist`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const wishlist = await response.json();
+                    isInWishlist = wishlist.some(item => item.product.id == productId);
+                    updateWishlistButton();
+                }
+            } catch (error) {
+                console.error('Error checking wishlist:', error);
+            }
+        }
+
+        function updateWishlistButton() {
+            const btn = document.getElementById('wishlistBtn');
+            if (isInWishlist) {
+                btn.classList.add('active');
+                btn.innerHTML = '<i class="fas fa-heart"></i>';
+            } else {
+                btn.classList.remove('active');
+                btn.innerHTML = '<i class="far fa-heart"></i>';
+            }
+        }
+
+        async function toggleWishlist() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/login.html';
+                return;
+            }
+            
+            try {
+                if (isInWishlist) {
+                    // Remove from wishlist - need wishlist item ID
+                    const wishlistResponse = await fetch(`${API_BASE_URL}/wishlist`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    
+                    if (wishlistResponse.ok) {
+                        const wishlist = await wishlistResponse.json();
+                        const wishlistItem = wishlist.find(item => item.product.id == currentProduct.id);
+                        
+                        if (wishlistItem) {
+                            await fetch(`${API_BASE_URL}/wishlist/${wishlistItem.id}`, {
+                                method: 'DELETE',
+                                headers: { 'Authorization': `Bearer ${token}` }
+                            });
+                            
+                            isInWishlist = false;
+                            showToast('Removed from wishlist', 'success');
+                        }
+                    }
+                } else {
+                    // Add to wishlist
+                    const response = await fetch(`${API_BASE_URL}/wishlist`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ productId: currentProduct.id })
+                    });
+                    
+                    if (response.ok) {
+                        isInWishlist = true;
+                        showToast('Added to wishlist', 'success');
+                    } else {
+                        throw new Error('Failed to add to wishlist');
+                    }
+                }
+                
+                updateWishlistButton();
+                updateCounts();
+                
+            } catch (error) {
+                console.error('Error toggling wishlist:', error);
+                showToast('Failed to update wishlist', 'error');
+            }
+        }
+
+        function changeQuantity(change) {
+            const newQuantity = currentQuantity + change;
+            
+            if (newQuantity < 1 || newQuantity > currentProduct.stockQty) {
+                return;
+            }
+            
+            currentQuantity = newQuantity;
+            document.getElementById('quantity').textContent = currentQuantity;
+            
+            // Update button states
+            document.getElementById('qtyMinus').disabled = currentQuantity <= 1;
+            document.getElementById('qtyPlus').disabled = currentQuantity >= currentProduct.stockQty;
+        }
+
+        async function addToCart() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/login.html';
+                return;
+            }
+            
+            const btn = document.getElementById('addToCartBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/cart`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        productId: currentProduct.id,
+                        quantity: currentQuantity
+                    })
+                });
+                
+                if (response.ok) {
+                    showToast(`Added ${currentQuantity} item(s) to cart`, 'success');
+                    updateCounts();
+                } else {
+                    throw new Error('Failed to add to cart');
+                }
+                
+            } catch (error) {
+                console.error('Error adding to cart:', error);
+                showToast('Failed to add to cart', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-shopping-bag"></i> Add to Cart';
+            }
+        }
+
+        async function updateCounts() {
+            const token = localStorage.getItem('token');
+            if (!token) return;
+            
+            try {
+                // Update cart count
+                const cartResponse = await fetch(`${API_BASE_URL}/cart`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (cartResponse.ok) {
+                    const cart = await cartResponse.json();
+                    const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+                    document.getElementById('cartCount').textContent = cartCount;
+                }
+                
+                // Update wishlist count
+                const wishlistResponse = await fetch(`${API_BASE_URL}/wishlist`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (wishlistResponse.ok) {
+                    const wishlist = await wishlistResponse.json();
+                    document.getElementById('wishlistCount').textContent = wishlist.length;
+                }
+                
+            } catch (error) {
+                console.error('Error updating counts:', error);
+            }
+        }
+
+        function showToast(message, type = 'success') {
+            const existingToast = document.querySelector('.toast');
+            if (existingToast) existingToast.remove();
+            
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'}"></i>
+                <span>${message}</span>
+            `;
+            
+            document.body.appendChild(toast);
+            setTimeout(() => toast.classList.add('show'), 100);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

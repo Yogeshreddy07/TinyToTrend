@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - TinyToTrend</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #ff3f6c;
+            --secondary-color: #282c3f;
+            --text-dark: #282c3f;
+            --text-light: #94969f;
+            --border-color: #e9e9ed;
+            --bg-light: #f5f5f6;
+            --white: #ffffff;
+            --success: #03a685;
+            --error: #ff5722;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-light);
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: var(--white);
+            padding: 15px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .logo .brand {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .auth-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            max-width: 1200px;
+            margin: 40px auto;
+            min-height: calc(100vh - 150px);
+            gap: 0;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+        }
+
+        .auth-card {
+            background: var(--white);
+            padding: 50px;
+            border-radius: 8px 0 0 8px;
+        }
+
+        .auth-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 40px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 15px;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-light);
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .auth-tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        .auth-form h2 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--text-dark);
+        }
+
+        .auth-subtitle {
+            color: var(--text-light);
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(255,63,108,0.1);
+        }
+
+        .password-input {
+            position: relative;
+        }
+
+        .password-input input {
+            padding-right: 45px;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: var(--text-light);
+            transition: color 0.3s;
+        }
+
+        .toggle-password:hover {
+            color: var(--text-dark);
+        }
+
+        .form-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .checkbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .checkbox input {
+            width: auto;
+            cursor: pointer;
+        }
+
+        .forgot-link {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .forgot-link:hover {
+            text-decoration: underline;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: #e63462;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255,63,108,0.3);
+        }
+
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--text-dark);
+            color: var(--text-dark);
+        }
+
+        .btn-outline:hover {
+            background: var(--text-dark);
+            color: var(--white);
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 4px;
+            margin-top: 16px;
+            font-size: 14px;
+        }
+
+        .alert-error {
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #ef5350;
+        }
+
+        .auth-divider {
+            text-align: center;
+            margin: 30px 0;
+            position: relative;
+        }
+
+        .auth-divider span {
+            background: var(--white);
+            padding: 0 15px;
+            color: var(--text-light);
+            font-size: 14px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .auth-divider::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 50%;
+            height: 1px;
+            background: var(--border-color);
+        }
+
+        .admin-note {
+            margin-top: 20px;
+            padding: 15px;
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            color: #e65100;
+        }
+
+        .auth-banner {
+            position: relative;
+            border-radius: 0 8px 8px 0;
+            overflow: hidden;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .banner-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: var(--white);
+            padding: 40px;
+        }
+
+        .banner-overlay h1 {
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .banner-overlay p {
+            font-size: 18px;
+            margin-bottom: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .auth-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .auth-banner {
+                display: none;
+            }
+            
+            .auth-card {
+                border-radius: 8px;
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Simple Navbar -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">
+                <a href="/" class="brand">TinyToTrend</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-tabs">
+                <button class="auth-tab active" onclick="switchTab('user')">
+                    <i class="fas fa-user"></i> User Login
+                </button>
+                <button class="auth-tab" onclick="switchTab('admin')">
+                    <i class="fas fa-user-shield"></i> Admin Login
+                </button>
+            </div>
+
+            <!-- User Login Form -->
+            <div id="userLoginForm" class="auth-form">
+                <h2>Welcome Back!</h2>
+                <p class="auth-subtitle">Login to continue shopping</p>
+
+                <form id="loginForm" onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label for="email">
+                            <i class="fas fa-envelope"></i> Email Address
+                        </label>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email" 
+                            placeholder="Enter your email"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">
+                            <i class="fas fa-lock"></i> Password
+                        </label>
+                        <div class="password-input">
+                            <input 
+                                type="password" 
+                                id="password" 
+                                name="password" 
+                                placeholder="Enter your password"
+                                required
+                            >
+                            <i class="fas fa-eye toggle-password" onclick="togglePassword('password')"></i>
+                        </div>
+                    </div>
+
+                    <div class="form-footer">
+                        <label class="checkbox">
+                            <input type="checkbox" id="remember">
+                            <span>Remember me</span>
+                        </label>
+                        <a href="#" class="forgot-link">Forgot Password?</a>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" id="loginBtn">
+                        LOGIN
+                    </button>
+
+                    <div class="alert alert-error" id="loginError" style="display:none;"></div>
+                </form>
+
+                <div class="auth-divider">
+                    <span>Don't have an account?</span>
+                </div>
+
+                <button class="btn btn-outline" onclick="window.location.href='/register.html'">
+                    CREATE NEW ACCOUNT
+                </button>
+            </div>
+
+            <!-- Admin Login Form -->
+            <div id="adminLoginForm" class="auth-form" style="display:none;">
+                <h2>Admin Access</h2>
+                <p class="auth-subtitle">Secure login for administrators</p>
+
+                <form id="adminLoginFormElement" onsubmit="handleAdminLogin(event)">
+                    <div class="form-group">
+                        <label for="adminEmail">
+                            <i class="fas fa-envelope"></i> Admin Email
+                        </label>
+                        <input 
+                            type="email" 
+                            id="adminEmail" 
+                            name="email" 
+                            placeholder="Enter admin email"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="adminPassword">
+                            <i class="fas fa-lock"></i> Admin Password
+                        </label>
+                        <div class="password-input">
+                            <input 
+                                type="password" 
+                                id="adminPassword" 
+                                name="password" 
+                                placeholder="Enter admin password"
+                                required
+                            >
+                            <i class="fas fa-eye toggle-password" onclick="togglePassword('adminPassword')"></i>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" id="adminLoginBtn">
+                        ADMIN LOGIN
+                    </button>
+
+                    <div class="alert alert-error" id="adminLoginError" style="display:none;"></div>
+                </form>
+
+                <div class="admin-note">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Only authorized administrators can access this panel</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="auth-banner">
+            <div class="banner-overlay">
+                <h1>Fashion at Your Fingertips</h1>
+                <p>Discover the latest trends</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:8080/api';
+
+        // Tab Switching
+        function switchTab(tab) {
+            const userForm = document.getElementById('userLoginForm');
+            const adminForm = document.getElementById('adminLoginForm');
+            const tabs = document.querySelectorAll('.auth-tab');
+            
+            tabs.forEach(t => t.classList.remove('active'));
+            
+            if (tab === 'user') {
+                userForm.style.display = 'block';
+                adminForm.style.display = 'none';
+                tabs[0].classList.add('active');
+            } else {
+                userForm.style.display = 'none';
+                adminForm.style.display = 'block';
+                tabs[1].classList.add('active');
+            }
+        }
+
+        // Password Toggle
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const icon = input.parentElement.querySelector('.toggle-password');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        // User Login
+        async function handleLogin(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('loginError');
+            const btn = document.getElementById('loginBtn');
+            
+            errorDiv.style.display = 'none';
+            btn.disabled = true;
+            btn.textContent = 'LOGGING IN...';
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        password: password
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || 'Login failed');
+                }
+                
+                // Save user data
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('userId', data.userId);
+                localStorage.setItem('userName', data.name);
+                localStorage.setItem('userRole', data.role);
+                
+                // Redirect based on role
+                if (data.role === 'ADMIN') {
+                    window.location.href = '/admin/dashboard.html';
+                } else {
+                    window.location.href = '/';
+                }
+                
+            } catch (error) {
+                console.error('Login error:', error);
+                errorDiv.textContent = error.message || 'Invalid email or password';
+                errorDiv.style.display = 'block';
+                btn.disabled = false;
+                btn.textContent = 'LOGIN';
+            }
+        }
+
+        // Admin Login
+        async function handleAdminLogin(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('adminEmail').value;
+            const password = document.getElementById('adminPassword').value;
+            const errorDiv = document.getElementById('adminLoginError');
+            const btn = document.getElementById('adminLoginBtn');
+            
+            errorDiv.style.display = 'none';
+            btn.disabled = true;
+            btn.textContent = 'LOGGING IN...';
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        password: password
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || 'Login failed');
+                }
+                
+                if (data.role !== 'ADMIN') {
+                    throw new Error('Access denied. Admin credentials required.');
+                }
+                
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('userId', data.userId);
+                localStorage.setItem('userName', data.name);
+                localStorage.setItem('userRole', data.role);
+                
+                window.location.href = '/admin/dashboard.html';
+                
+            } catch (error) {
+                console.error('Admin login error:', error);
+                errorDiv.textContent = error.message || 'Invalid admin credentials';
+                errorDiv.style.display = 'block';
+                btn.disabled = false;
+                btn.textContent = 'ADMIN LOGIN';
+            }
+        }
+
+        // Check if already logged in
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('token');
+            const role = localStorage.getItem('userRole');
+            
+            if (token) {
+                if (role === 'ADMIN') {
+                    window.location.href = '/admin/dashboard.html';
+                } else {
+                    window.location.href = '/';
+                }
+            }
+        });
+    </script>
+</body>
+</html>

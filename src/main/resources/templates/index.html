@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TinyToTrend - Fashion for Everyone</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* ==================== GLOBAL STYLES ==================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #ff3f6c;
+            --secondary-color: #282c3f;
+            --text-dark: #282c3f;
+            --text-light: #94969f;
+            --border-color: #e9e9ed;
+            --bg-light: #f5f5f6;
+            --white: #ffffff;
+            --success: #03a685;
+            --error: #ff5722;
+            --shadow: 0 2px 16px rgba(0,0,0,0.08);
+            --shadow-hover: 0 4px 24px rgba(0,0,0,0.12);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            color: var(--text-dark);
+            background: var(--white);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* ==================== NAVIGATION ==================== */
+        .navbar {
+            background: var(--white);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow);
+        }
+
+        .nav-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            gap: 30px;
+        }
+
+        .logo .brand {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-link {
+            color: var(--text-dark);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+            transition: color 0.3s;
+            text-transform: uppercase;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color);
+        }
+
+        .nav-search {
+            flex: 1;
+            max-width: 450px;
+            position: relative;
+        }
+
+        .nav-search i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+        }
+
+        .nav-search input {
+            width: 100%;
+            padding: 10px 15px 10px 45px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 14px;
+            background: var(--bg-light);
+            transition: all 0.3s;
+        }
+
+        .nav-search input:focus {
+            outline: none;
+            background: var(--white);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(255,63,108,0.1);
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 25px;
+        }
+
+        .nav-action {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            position: relative;
+            transition: color 0.3s;
+        }
+
+        .nav-action:hover {
+            color: var(--primary-color);
+        }
+
+        .nav-action i {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .nav-action span {
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -5px;
+            right: -10px;
+            background: var(--primary-color);
+            color: var(--white);
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        /* ==================== HERO SECTION ==================== */
+        .hero {
+            position: relative;
+            height: 500px;
+            overflow: hidden;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .hero-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: var(--white);
+            z-index: 2;
+        }
+
+        .hero-content h1 {
+            font-size: 64px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .hero-content p {
+            font-size: 24px;
+            margin-bottom: 30px;
+            text-shadow: 1px 1px 4px rgba(0,0,0,0.3);
+        }
+
+        /* ==================== CATEGORIES ==================== */
+        .categories {
+            padding: 60px 0;
+        }
+
+        .section-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 40px;
+            text-align: center;
+            color: var(--text-dark);
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .category-card {
+            position: relative;
+            height: 400px;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .category-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .category-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+
+        .category-card:hover img {
+            transform: scale(1.1);
+        }
+
+        .category-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            padding: 30px 20px;
+            color: var(--white);
+        }
+
+        .category-overlay h3 {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        /* ==================== PRODUCTS ==================== */
+        .products {
+            padding: 60px 0;
+            background: var(--bg-light);
+        }
+
+        .products-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px;
+        }
+
+        .product-card {
+            background: var(--white);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .product-image {
+            position: relative;
+            height: 350px;
+            overflow: hidden;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .product-info {
+            padding: 15px;
+        }
+
+        .product-brand {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 5px;
+        }
+
+        .product-name {
+            font-size: 13px;
+            color: var(--text-light);
+            margin-bottom: 10px;
+        }
+
+        .product-price {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .price-current {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .add-to-bag {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary-color);
+            color: var(--white);
+            border: none;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.3s;
+        }
+
+        .add-to-bag:hover {
+            background: #e63462;
+        }
+
+        /* ==================== BUTTONS ==================== */
+        .btn {
+            padding: 12px 32px;
+            border: none;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: #e63462;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        /* ==================== FOOTER ==================== */
+        .footer {
+            background: var(--secondary-color);
+            color: var(--white);
+            padding: 60px 0 20px;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-col h4 {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .footer-col ul {
+            list-style: none;
+        }
+
+        .footer-col ul li {
+            margin-bottom: 12px;
+        }
+
+        .footer-col ul li a {
+            color: #94969f;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+
+        .footer-col ul li a:hover {
+            color: var(--white);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: #94969f;
+            font-size: 14px;
+        }
+
+        /* ==================== LOADING ==================== */
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-light);
+        }
+
+        .loading i {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        /* ==================== TOAST ==================== */
+        .toast {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transform: translateX(400px);
+            transition: transform 0.3s;
+            z-index: 10000;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast-success {
+            border-left: 4px solid var(--success);
+        }
+
+        .toast-error {
+            border-left: 4px solid var(--error);
+        }
+
+        .toast i {
+            font-size: 20px;
+        }
+
+        .toast-success i {
+            color: var(--success);
+        }
+
+        .toast-error i {
+            color: var(--error);
+        }
+
+        /* ==================== RESPONSIVE ==================== */
+        @media (max-width: 1024px) {
+            .category-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .products-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .nav-search {
+                max-width: 200px;
+            }
+            
+            .category-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .products-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .footer-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .hero-content h1 {
+                font-size: 36px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .category-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <div class="logo">
+                <a href="/" class="brand">TinyToTrend</a>
+            </div>
+            
+            <div class="nav-links">
+                <a href="?category=men" class="nav-link" data-category="men">MEN</a>
+                <a href="?category=women" class="nav-link" data-category="women">WOMEN</a>
+                <a href="?category=boys" class="nav-link" data-category="boys">BOYS</a>
+                <a href="?category=girls" class="nav-link" data-category="girls">GIRLS</a>
+            </div>
+            
+            <div class="nav-search">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search for products, brands and more">
+            </div>
+            
+            <div class="nav-actions">
+                <div class="nav-action" id="profileBtn">
+                    <i class="fas fa-user"></i>
+                    <span id="userName">Profile</span>
+                </div>
+                <div class="nav-action" id="wishlistBtn" onclick="window.location.href='/wishlist.html'">
+    <i class="fas fa-heart"></i>
+    <span>Wishlist</span>
+    <span class="badge" id="wishlistCount">0</span>
+</div>
+
+                <div class="nav-action" id="cartBtn">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span>Bag</span>
+                    <span class="cart-count" id="cartCount">0</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Banner -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>BIGGEST FASHION SALE</h1>
+            <p>Up to 70% OFF on Top Brands</p>
+            <button class="btn btn-primary" onclick="scrollToProducts()">Shop Now</button>
+        </div>
+    </section>
+
+    <!-- Category Cards -->
+    <section class="categories">
+        <div class="container">
+            <h2 class="section-title">Shop by Category</h2>
+            <div class="category-grid">
+                <div class="category-card" onclick="filterByCategory('men')">
+                    <img src="https://images.unsplash.com/photo-1490114538077-0a7f8cb49891?w=400&h=500&fit=crop" alt="Men">
+                    <div class="category-overlay">
+                        <h3>MEN</h3>
+                    </div>
+                </div>
+                <div class="category-card" onclick="filterByCategory('women')">
+                    <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400&h=500&fit=crop" alt="Women">
+                    <div class="category-overlay">
+                        <h3>WOMEN</h3>
+                    </div>
+                </div>
+                <div class="category-card" onclick="filterByCategory('boys')">
+                    <img src="https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?w=400&h=500&fit=crop" alt="Boys">
+                    <div class="category-overlay">
+                        <h3>BOYS</h3>
+                    </div>
+                </div>
+                <div class="category-card" onclick="filterByCategory('girls')">
+                    <img src="https://images.unsplash.com/photo-1518831959646-742c3a14ebf7?w=400&h=500&fit=crop" alt="Girls">
+                    <div class="category-overlay">
+                        <h3>GIRLS</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Products Section -->
+    <section class="products" id="products">
+        <div class="container">
+            <div class="products-header">
+                <h2 class="section-title">Trending Now</h2>
+            </div>
+            
+            <div class="products-grid" id="productsGrid">
+                <div class="loading">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Loading products...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>ONLINE SHOPPING</h4>
+                    <ul>
+                        <li><a href="#men">Men</a></li>
+                        <li><a href="#women">Women</a></li>
+                        <li><a href="#boys">Boys</a></li>
+                        <li><a href="#girls">Girls</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>CUSTOMER POLICIES</h4>
+                    <ul>
+                        <li><a href="#">Contact Us</a></li>
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Returns</a></li>
+                        <li><a href="#">Shipping</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>USEFUL LINKS</h4>
+                    <ul>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms & Conditions</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>FOLLOW US</h4>
+                    <ul>
+                        <li><a href="#"><i class="fab fa-facebook"></i> Facebook</a></li>
+                        <li><a href="#"><i class="fab fa-instagram"></i> Instagram</a></li>
+                        <li><a href="#"><i class="fab fa-twitter"></i> Twitter</a></li>
+                        <li><a href="#"><i class="fab fa-youtube"></i> YouTube</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 TinyToTrend. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ==================== CONFIGURATION ====================
+        const API_BASE_URL = 'http://localhost:8080/api';
+        let currentUser = null;
+
+        // ==================== INITIALIZATION ====================
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuth();
+            loadProducts();
+            setupEventListeners();
+            updateCartCount();
+        });
+
+        // ==================== AUTHENTICATION ====================
+        function checkAuth() {
+            const token = localStorage.getItem('token');
+            const userName = localStorage.getItem('userName');
+            
+            if (token && userName) {
+                currentUser = {
+                    token: token,
+                    name: userName
+                };
+                document.getElementById('userName').textContent = userName;
+            }
+        }
+
+        function setupEventListeners() {
+            const profileBtn = document.getElementById('profileBtn');
+            if (profileBtn) {
+                profileBtn.addEventListener('click', () => {
+                    if (currentUser) {
+                        window.location.href = '/profile.html';
+                    } else {
+                        window.location.href = '/login.html';
+                    }
+                });
+            }
+            
+            const cartBtn = document.getElementById('cartBtn');
+            if (cartBtn) {
+                cartBtn.addEventListener('click', () => {
+                    window.location.href = '/cart.html';
+                });
+            }
+        }
+
+        // ==================== PRODUCTS ====================
+        async function loadProducts(category = '') {
+            const productsGrid = document.getElementById('productsGrid');
+            
+            productsGrid.innerHTML = `
+                <div class="loading">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Loading products...</p>
+                </div>
+            `;
+            
+            try {
+                let url = `${API_BASE_URL}/products`;
+                if (category) {
+                    url += `?category=${category}`;
+                }
+                
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error('Failed to load products');
+                }
+                
+                const products = await response.json();
+                displayProducts(products);
+                
+            } catch (error) {
+                console.error('Error loading products:', error);
+                productsGrid.innerHTML = `
+                    <div class="loading">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>Failed to load products. Please try again.</p>
+                    </div>
+                `;
+            }
+        }
+
+        function displayProducts(products) {
+            const productsGrid = document.getElementById('productsGrid');
+            
+            if (products.length === 0) {
+                productsGrid.innerHTML = `
+                    <div class="loading">
+                        <i class="fas fa-shopping-bag"></i>
+                        <p>No products found</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            productsGrid.innerHTML = products.map(product => `
+                <div class="product-card" onclick="viewProduct(${product.id})">
+                    <div class="product-image">
+                        <img src="${product.imageUrl || 'https://via.placeholder.com/400x500?text=No+Image'}" 
+                             alt="${product.name}"
+                             onerror="this.src='https://via.placeholder.com/400x500?text=No+Image'">
+                    </div>
+                    <div class="product-info">
+                        <div class="product-brand">${product.category.toUpperCase()}</div>
+                        <div class="product-name">${product.name}</div>
+                        <div class="product-price">
+                            <span class="price-current">₹${product.price.toFixed(2)}</span>
+                        </div>
+                        <button class="add-to-bag" onclick="event.stopPropagation(); addToCart(${product.id})">
+                            <i class="fas fa-shopping-bag"></i> ADD TO BAG
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterByCategory(category) {
+            loadProducts(category);
+            scrollToProducts();
+        }
+
+        function scrollToProducts() {
+            document.getElementById('products').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function viewProduct(productId) {
+            window.location.href = `/product-detail.html?id=${productId}`;
+        }
+
+        // ==================== CART ====================
+        async function addToCart(productId) {
+            const token = localStorage.getItem('token');
+            
+            if (!token) {
+                alert('Please login to add items to cart');
+                window.location.href = '/login.html';
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/cart`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        productId: productId,
+                        quantity: 1
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to add to cart');
+                }
+                
+                showToast('Added to bag successfully!', 'success');
+                updateCartCount();
+                
+            } catch (error) {
+                console.error('Error adding to cart:', error);
+                showToast('Failed to add to bag', 'error');
+            }
+        }
+
+        function updateCartCount() {
+            const token = localStorage.getItem('token');
+            const cartCountElement = document.getElementById('cartCount');
+            
+            if (!token) {
+                cartCountElement.textContent = '0';
+                return;
+            }
+            
+            fetch(`${API_BASE_URL}/cart`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(response => response.json())
+            .then(items => {
+                const totalCount = items.reduce((sum, item) => sum + item.quantity, 0);
+                cartCountElement.textContent = totalCount;
+            })
+            .catch(error => {
+                console.error('Error updating cart count:', error);
+                cartCountElement.textContent = '0';
+            });
+        }
+
+        // ==================== UTILITY ====================
+        function showToast(message, type = 'info') {
+            const existingToast = document.querySelector('.toast');
+            if (existingToast) {
+                existingToast.remove();
+            }
+            
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                <span>${message}</span>
+            `;
+            
+            document.body.appendChild(toast);
+            setTimeout(() => toast.classList.add('show'), 100);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+        document.addEventListener('DOMContentLoaded', updateWishlistCount);
+
+    async function updateWishlistCount() {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            document.getElementById('wishlistCount').style.display = 'none';
+            return;
+        }
+        try {
+            const res = await fetch('http://localhost:8080/api/wishlist', {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            });
+            if (res.ok) {
+                const wishlist = await res.json();
+                const count = Array.isArray(wishlist) ? wishlist.length : 0;
+                const badge = document.getElementById('wishlistCount');
+                badge.textContent = count;
+                badge.style.display = (count > 0) ? 'inline-block' : 'none';
+            }
+        } catch (e) {
+            // Hide badge if error or not logged in
+            document.getElementById('wishlistCount').style.display = 'none';
+        }
+    }
+    </script>
+</body>
+</html>

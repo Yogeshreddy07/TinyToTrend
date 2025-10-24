@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - TinyToTrend</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #ff3f6c;
+            --bg-light: #f5f5f6;
+            --border: #e9e9ed;
+            --white: #fff;
+            --success: #03a685;
+            --error: #e74c3c;
+        }
+        body {
+            background: var(--bg-light);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            color: #282c3f;
+        }
+        .navbar {
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            box-shadow: 0 1px 8px #0001;
+            padding: 18px 0;
+        }
+        .navbar .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 28px;
+        }
+        .logo { font-size: 24px; font-weight: 700; color: var(--primary); letter-spacing: -.5px; text-decoration: none; }
+        .nav-actions {
+            display: flex; gap: 28px; align-items: center;
+        }
+        .nav-action { text-decoration: none; color: #282c3f; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 7px;}
+        .nav-action i { font-size: 19px; }
+        .container-checkout {
+            max-width: 1020px;
+            margin: 44px auto 0;
+            background: var(--white);
+            box-shadow: 0 2px 16px #0002;
+            border-radius: 8px;
+            display: flex;
+            gap: 38px;
+            padding: 40px 35px;
+            align-items: flex-start;
+        }
+        .checkout-form-section { flex: 1.2; min-width: 320px;}
+        .checkout-summary-section { flex: 1; }
+        .checkout-title { font-size: 26px; font-weight: 700; margin-bottom: 18px;}
+        .form-group { margin-bottom: 17px; }
+        .form-group label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+        .form-group input, .form-group textarea {
+            width: 100%; padding: 10px 12px; border-radius: 5px; border: 1.3px solid #e0e0e0; font-size: 15px;
+        }
+        .form-group textarea { resize: vertical; min-height: 60px; }
+        .checkout-btn {
+            width: 100%; margin-top: 14px; padding: 15px 0;
+            font-size: 16px; background: var(--primary); color: var(--white); border: none;
+            border-radius: 6px; font-weight: 700; cursor: pointer; transition: background .2s;
+        }
+        .checkout-btn:disabled { background: #ccc; cursor: not-allowed; }
+        .summary-section {
+            background: #fff7fa; border-radius: 8px; box-shadow: 0 0 8px #ff3f6c22; padding: 24px 21px 19px;
+        }
+        .summary-title { font-size: 17px; font-weight: 600; margin-bottom: 16px;}
+        .summary-item-list { list-style: none; margin: 0 0 10px 0; padding: 0;}
+        .summary-item { display: flex; align-items: center; gap:14px; border-bottom: 1px solid var(--border); padding: 12px 0;}
+        .summary-item:last-child { border-bottom: none;}
+        .item-img img { width: 67px; height: 85px; object-fit: cover; border-radius: 7px;}
+        .item-info .item-title { font-size: 15px; font-weight: 600;}
+        .item-info .item-meta { font-size: 13px; color: #888;}
+        .item-info .item-price { color: var(--primary); font-weight: 700; font-size: 15px; }
+        .summary-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 15px;}
+        .summary-row.total { font-weight: 700; font-size: 17px; margin-top: 14px;}
+        .order-status-success, .order-status-fail {
+            background: var(--success); color: #fff; text-align: center; margin-top: 32px;
+            padding: 28px; border-radius: 9px; font-size: 18px; font-weight: 600;
+        }
+        .order-status-fail { background: var(--error); }
+        @media (max-width:1000px) {
+            .container-checkout { flex-direction: column; padding: 30px 9vw;}
+            .checkout-summary-section {margin-left:0;}
+        }
+        @media (max-width:640px) {
+            .container-checkout { padding: 13px 2vw;}
+        }
+    </style>
+</head>
+<body>
+    <!-- NavBar -->
+    <nav class="navbar">
+        <div class="container">
+            <a href="/" class="logo">TinyToTrend</a>
+            <div class="nav-actions">
+                <a href="/cart.html" class="nav-action">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span>Cart</span>
+                    <span class="cart-count" id="cartCount">0</span>
+                </a>
+                <a href="/profile.html" class="nav-action">
+                    <i class="fas fa-user"></i>
+                    <span id="navUserName">Profile</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container-checkout" id="checkoutPage">
+        <div class="checkout-form-section">
+            <div class="checkout-title">Shipping Address</div>
+            <form id="checkoutForm" onsubmit="placeOrder(event)">
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input id="name" placeholder="Your Name" required>
+                </div>
+                <div class="form-group">
+                    <label for="address">Address</label>
+                    <textarea id="address" placeholder="Street, City, State, Pincode" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="mobile">Mobile Number</label>
+                    <input id="mobile" type="tel" pattern="[0-9]{10,15}" required>
+                </div>
+                <button type="submit" class="checkout-btn" id="orderBtn">PLACE ORDER</button>
+            </form>
+            <div id="orderStatus"></div>
+        </div>
+        <div class="checkout-summary-section">
+            <div class="summary-section">
+                <div class="summary-title">Order Summary</div>
+                <ul class="summary-item-list" id="summaryItemList"></ul>
+                <div class="summary-row">
+                    <span>Subtotal</span>
+                    <span id="summarySubtotal">₹0.00</span>
+                </div>
+                <div class="summary-row">
+                    <span>Delivery</span>
+                    <span>Free</span>
+                </div>
+                <div class="summary-row total">
+                    <span>Total</span>
+                    <span id="summaryTotal">₹0.00</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        const API_BASE_URL = "http://localhost:8080/api";
+        let token = localStorage.getItem("token");
+        let userName = localStorage.getItem("userName") || "Profile";
+        document.getElementById("navUserName").textContent = userName;
+        let subtotal = 0;
+
+        function formatPrice(n) { return "₹" + Number(n).toFixed(2); }
+
+        async function fetchCartAndShowSummary() {
+            if (!token) { window.location.href = "/login.html"; return;}
+            const res = await fetch(API_BASE_URL + "/cart", {
+                headers: { "Authorization": "Bearer " + token }
+            });
+            let cart = await res.json();
+            document.getElementById("cartCount").textContent = cart.length;
+            const summaryList = document.getElementById("summaryItemList");
+            summaryList.innerHTML = "";
+
+            subtotal = 0;
+            cart.forEach(item => {
+                let img = item.product.imageUrl || 'https://placehold.co/100x120/EEE/222?text=No+Image';
+                subtotal += (item.product.price * item.quantity);
+                summaryList.innerHTML += `
+                    <li class="summary-item">
+                        <div class="item-img"><img src="${img}" alt="${item.product.name}"></div>
+                        <div class="item-info">
+                            <div class="item-title">${item.product.name}</div>
+                            <div class="item-meta">${item.product.category} • ${item.product.genderTag}</div>
+                            <div class="item-price">${formatPrice(item.product.price)} × ${item.quantity}</div>
+                        </div>
+                    </li>
+                `;
+            });
+            document.getElementById("summarySubtotal").textContent = formatPrice(subtotal);
+            document.getElementById("summaryTotal").textContent = formatPrice(subtotal);
+
+            // Empty cart handling
+            if (!cart.length) {
+                document.getElementById("orderBtn").disabled = true;
+                document.getElementById("orderBtn").textContent = "Your cart is empty";
+            }
+        }
+
+        // Place order API
+        async function placeOrder(e) {
+            e.preventDefault();
+            const name = document.getElementById("name").value.trim();
+            const address = document.getElementById("address").value.trim();
+            const mobile = document.getElementById("mobile").value.trim();
+            if (!name || !address || !mobile) return;
+            const orderBtn = document.getElementById("orderBtn");
+            orderBtn.disabled = true;
+            orderBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Placing...';
+            document.getElementById("orderStatus").innerHTML = "";
+
+            try {
+                // Place order POST /api/orders
+                const res = await fetch(API_BASE_URL + "/orders", {
+                    method: "POST",
+                    headers: {
+                        "Authorization": "Bearer " + token,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        shippingAddress: address,
+                        mobile
+                    })
+                });
+                if (!res.ok) throw new Error("Server error");
+                const data = await res.json();
+                document.getElementById("orderStatus").innerHTML =
+                    `<div class="order-status-success"><i class="fas fa-check-circle"></i> Order placed successfully! <br>Your Order ID: <b>${data.orderId || ""}</b> <br><br><a href="/orders.html" style="color:var(--white);text-decoration:underline;">View Orders</a></div>`;
+                orderBtn.style.display = "none";
+                // Optionally, clear form
+                document.getElementById("checkoutForm").reset();
+            } catch (err) {
+                document.getElementById("orderStatus").innerHTML =
+                    `<div class="order-status-fail"><i class="fas fa-exclamation-triangle"></i> Failed to place order. Please try again.</div>`;
+                orderBtn.disabled = false;
+                orderBtn.innerHTML = 'PLACE ORDER';
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", fetchCartAndShowSummary);
+    </script>
+</body>
+</html>

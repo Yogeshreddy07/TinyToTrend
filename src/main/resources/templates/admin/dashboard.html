@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - TinyToTrend</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #ff3f6c;
+            --secondary-color: #282c3f;
+            --bg-light: #f5f5f6;
+            --white: #fff;
+            --border-color: #e9e9ed;
+            --success: #03a685;
+            --error: #ff5722;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-light);
+            margin: 0;
+            color: var(--secondary-color);
+        }
+        .navbar {
+            background: var(--white);
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px 0;
+            font-weight: 700;
+            font-size: 20px;
+            color: var(--primary-color);
+            letter-spacing: -0.5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .navbar .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0 30px;
+        }
+        .dashboard-layout {
+            display: flex;
+            min-height: 90vh;
+        }
+        .sidebar {
+            width: 240px;
+            background: var(--white);
+            border-right: 1px solid var(--border-color);
+            padding: 40px 0 40px 0;
+            box-shadow: 2px 0 6px #d0d0d03a;
+        }
+        .sidebar h3 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 32px;
+        }
+        .sidebar-links {
+            list-style: none;
+            padding: 0 0 0 0;
+        }
+        .sidebar-links li {
+            margin: 0 0 5px 0;
+        }
+        .sidebar-links a {
+            display: block;
+            color: var(--secondary-color);
+            padding: 13px 38px;
+            text-decoration: none;
+            font-weight: 500;
+            border-left: 4px solid transparent;
+            transition: 0.3s;
+        }
+        .sidebar-links a.active,
+        .sidebar-links a:hover {
+            color: var(--primary-color);
+            background: var(--bg-light);
+            border-left: 4px solid var(--primary-color);
+        }
+        .sidebar-links i {
+            width: 24px;
+        }
+        .logout-link {
+            display: block;
+            margin: 35px auto 0;
+            width: 85%;
+            padding: 12px 0;
+            background: var(--error);
+            color: var(--white);
+            border: none;
+            border-radius: 4px;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+            transition: background 0.2s;
+            text-decoration: none;
+        }
+        .logout-link:hover { background: #c0392b; }
+        .main {
+            flex: 1;
+            padding: 40px 4vw;
+        }
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 32px;
+            margin-bottom: 40px;
+        }
+        .dash-card {
+            background: var(--white);
+            border-radius: 8px;
+            padding: 38px 30px;
+            text-align: center;
+            box-shadow: 0 2px 8px #0001;
+            transition: 0.25s;
+        }
+        .dash-card:hover { transform: translateY(-4px) scale(1.02);}
+        .dash-card h2 {
+            font-size: 32px;
+            margin-bottom: 5px;
+        }
+        .dash-card span {
+            font-size: 15px;
+            color: var(--primary-color);
+        }
+        .dash-card i {
+            font-size: 32px;
+            color: var(--primary-color);
+            margin-bottom: 12px;
+        }
+        .section-title {
+            font-size: 26px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        .section-desc {
+            font-size: 15px;
+            color: var(--secondary-color);
+            margin-bottom: 32px;
+        }
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--white);
+            box-shadow: 0 2px 8px #0001;
+        }
+        th, td {
+            padding: 14px 12px;
+            border-bottom: 1px solid var(--border-color);
+            text-align: left;
+        }
+        thead th {
+            color: var(--primary-color);
+            letter-spacing: 0.5px;
+            font-sized: 15px;
+        }
+        tr:last-child td {
+            border-bottom: none;
+        }
+        .action-btn {
+            margin-right: 10px;
+            background: var(--primary-color);
+            color: var(--white);
+            border: none;
+            border-radius: 4px;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .action-btn.delete {
+            background: var(--error);
+        }
+        .add-btn {
+            background: var(--primary-color);
+            color: var(--white);
+            border: none;
+            padding: 10px 22px;
+            border-radius: 4px;
+            font-weight: 600;
+            float: right;
+            margin-bottom: 18px;
+            cursor: pointer;
+        }
+        .form-modal-bg {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: #0007;
+            z-index: 999;
+            justify-content: center;
+            align-items: center;
+        }
+        .form-modal {
+            background: var(--white);
+            border-radius: 12px;
+            width: 440px;
+            padding: 32px;
+            box-shadow: 0 8px 32px #0004;
+            position: relative;
+        }
+        .modal-close {
+            position: absolute;
+            top: 18px; right: 23px;
+            font-size: 18px;
+            cursor: pointer;
+            color: #aaa;
+        }
+        .modal-close:hover { color: var(--primary-color);}
+        .form-group {margin-bottom:18px;}
+        .form-group label {display:block;font-size:13px;font-weight:bold;margin-bottom:6px;}
+        .form-group input, .form-group select, .form-group textarea {
+            padding:9px 12px;border-radius:4px;border:1px solid var(--border-color);width:100%;font-size:14px;
+        }
+        .form-group input[type="file"] {padding:0;}
+        @media (max-width: 1200px) {
+            .dashboard-cards { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 768px) {
+            .dashboard-layout { flex-direction: column; }
+            .sidebar { width: 100%; box-shadow: none; border-right: 0; border-bottom: 1px solid var(--border-color);}
+            .main { padding: 30px 6vw;}
+            .dashboard-cards { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="container">
+            <span>TinyToTrend Admin Dashboard</span>
+            <a class="logout-link" href="#" onclick="logout();">Logout <i class="fas fa-sign-out-alt"></i></a>
+        </div>
+    </div>
+    <div class="dashboard-layout">
+        <nav class="sidebar">
+            <h3>Admin Panel</h3>
+            <ul class="sidebar-links">
+                <li><a href="#" class="active" onclick="showSection('dashboard',this)"><i class="fas fa-chart-bar"></i> Dashboard</a></li>
+                <li><a href="#" onclick="showSection('products',this)"><i class="fas fa-tshirt"></i> Products</a></li>
+                <li><a href="#" onclick="showSection('orders',this)"><i class="fas fa-shopping-cart"></i> Orders</a></li>
+                <li><a href="#" onclick="showSection('users',this)"><i class="fas fa-users"></i> Users</a></li>
+                <li><a href="#" onclick="showSection('analytics',this)"><i class="fas fa-chart-line"></i> Analytics</a></li>
+                <li><a href="#" onclick="showSection('settings',this)"><i class="fas fa-cog"></i> Settings</a></li>
+            </ul>
+        </nav>
+        <main class="main">
+            <!-- Dashboard -->
+            <div id="dashboardSection">
+                <div class="dashboard-cards">
+                    <div class="dash-card">
+                        <i class="fas fa-tshirt"></i>
+                        <h2 id="statProducts">--</h2>
+                        <span>Products</span>
+                    </div>
+                    <div class="dash-card">
+                        <i class="fas fa-users"></i>
+                        <h2 id="statUsers">--</h2>
+                        <span>Users</span>
+                    </div>
+                    <div class="dash-card">
+                        <i class="fas fa-shopping-cart"></i>
+                        <h2 id="statOrders">--</h2>
+                        <span>Orders</span>
+                    </div>
+                    <div class="dash-card">
+                        <i class="fas fa-rupee-sign"></i>
+                        <h2 id="statSales">--</h2>
+                        <span>Total Sales</span>
+                    </div>
+                </div>
+                <h2 class="section-title">Quick Stats</h2>
+                <p class="section-desc">Get an overview of store performance. Use the sidebar to navigate to features.</p>
+            </div>
+
+            <!-- Products -->
+            <div id="productsSection" style="display:none;">
+                <h2 class="section-title">Products</h2>
+                <button class="add-btn" onclick="openProductModal()">+ Add Product</button>
+                <table id="productsTable">
+                    <thead>
+                        <tr>
+                            <th>#ID</th>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>StockQty</th>
+                            <th>Gender</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Dynamically filled -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Orders Section -->
+            <div id="ordersSection" style="display:none;">
+                <h2 class="section-title">Orders</h2>
+                <table id="ordersTable">
+                    <thead>
+                        <tr>
+                            <th>#Order</th>
+                            <th>User</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Dynamically filled -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Users Section -->
+            <div id="usersSection" style="display:none;">
+                <h2 class="section-title">Users</h2>
+                <table id="usersTable">
+                    <thead>
+                        <tr>
+                            <th>#UserID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Created</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Dynamically filled -->
+                    </tbody>
+                </table>
+            </div>
+            <div id="analyticsSection" style="display:none;">
+                <h2 class="section-title">Analytics</h2>
+                <div class="section-desc">(Analytics features coming soon! Add charts here.)</div>
+            </div>
+            <div id="settingsSection" style="display:none;">
+                <h2 class="section-title">Settings</h2>
+                <div class="section-desc">Adjust admin settings (coming soon).</div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Product Modal (Create/Update) -->
+    <div class="form-modal-bg" id="productModalBg">
+        <div class="form-modal">
+            <span class="modal-close" onclick="closeProductModal()">&times;</span>
+            <h2 id="modalTitle">Add Product</h2>
+            <form id="productForm" onsubmit="submitProduct(event)">
+                <input type="hidden" id="productId">
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" id="prodName" required>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="prodDesc" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="prodCategory" required>
+                        <option value="men">Men</option>
+                        <option value="women">Women</option>
+                        <option value="boys">Boys</option>
+                        <option value="girls">Girls</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Price</label>
+                    <input type="number" id="prodPrice" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label>Stock Quantity</label>
+                    <input type="number" id="prodQty" required>
+                </div>
+                <div class="form-group">
+                    <label>Gender Tag</label>
+                    <select id="prodGenderTag" required>
+                        <option value="men">Men</option>
+                        <option value="women">Women</option>
+                        <option value="boys">Boys</option>
+                        <option value="girls">Girls</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Image URL</label>
+                    <input type="text" id="prodImage">
+                </div>
+                <button type="submit" class="add-btn" id="saveProductBtn">Save</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        const API_BASE_URL = 'http://localhost:8080/api';
+        let ADMIN_TOKEN = localStorage.getItem('token');
+        let ADMIN_ROLE = localStorage.getItem('userRole');
+
+        if (!ADMIN_TOKEN || ADMIN_ROLE !== "ADMIN") {
+            window.location.href = "/login.html?return=/admin/dashboard.html";
+        }
+
+        function logout() {
+            localStorage.clear(); 
+            window.location.href = "/login.html";
+        }
+
+        // Sidebar navigation
+        function showSection(section, el) {
+            ['dashboard','products','orders','users','analytics','settings'].forEach(id=>{
+                document.getElementById(id+'Section').style.display = (id === section) ? '' : 'none';
+            });
+            document.querySelectorAll('.sidebar-links a').forEach(link=>link.classList.remove('active'));
+            if(el) el.classList.add('active');
+            if(section==='products') listProducts();
+            if(section==='orders') listOrders();
+            if(section==='users') listUsers();
+        }
+
+        // --- DASHBOARD DATA ---
+        async function fetchAdminStats() {
+            // Example: Replace with real endpoints
+            let [productsRes, usersRes, ordersRes] = await Promise.all([
+                fetch(API_BASE_URL+'/admin/products',{headers:{'Authorization':'Bearer '+ADMIN_TOKEN}}),
+                fetch(API_BASE_URL+'/admin/users',{headers:{'Authorization':'Bearer '+ADMIN_TOKEN}}),
+                fetch(API_BASE_URL+'/admin/orders',{headers:{'Authorization':'Bearer '+ADMIN_TOKEN}})
+            ]);
+            let products = await productsRes.json();
+            let users = await usersRes.json();
+            let orders = await ordersRes.json();
+            let sales = orders.reduce((t,o)=>t+parseFloat(o.totalAmount || 0),0);
+            document.getElementById('statProducts').innerText = products.length;
+            document.getElementById('statUsers').innerText = users.length;
+            document.getElementById('statOrders').innerText = orders.length;
+            document.getElementById('statSales').innerText = "₹"+sales.toFixed(2);
+        }
+        fetchAdminStats();
+
+        // --- PRODUCTS ---
+        async function listProducts() {
+            let tb = document.getElementById("productsTable").querySelector('tbody');
+            tb.innerHTML = `<tr><td colspan="7">Loading...</td></tr>`;
+            let res = await fetch(API_BASE_URL+'/admin/products',{headers:{'Authorization':'Bearer '+ADMIN_TOKEN}});
+            let products = await res.json();
+            tb.innerHTML = products.map(prod => `
+                <tr>
+                    <td>${prod.id}</td>
+                    <td>${prod.name}</td>
+                    <td>${prod.category}</td>
+                    <td>₹${prod.price}</td>
+                    <td>${prod.stockQty}</td>
+                    <td>${prod.genderTag}</td>
+                    <td>
+                        <button class="action-btn" onclick="editProduct(${prod.id})">Edit</button>
+                        <button class="action-btn delete" onclick="deleteProduct(${prod.id})">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        async function deleteProduct(productId) {
+            if (!confirm("Delete this product?")) return;
+            let res = await fetch(API_BASE_URL+'/admin/products/'+productId, {
+                method:'DELETE',
+                headers:{'Authorization':'Bearer '+ADMIN_TOKEN}
+            });
+            if(res.ok) {
+                listProducts();
+                fetchAdminStats();
+            }
+        }
+        function openProductModal(edit=false) {
+            document.getElementById('productModalBg').style.display = 'flex';
+            if(!edit){
+                document.getElementById('productForm').reset();
+                document.getElementById('modalTitle').innerText = "Add Product";
+                document.getElementById('productId').value = "";
+            }
+        }
+        function closeProductModal() {
+            document.getElementById('productModalBg').style.display = 'none';
+        }
+        async function editProduct(id) {
+            openProductModal(true);
+            document.getElementById('modalTitle').innerText = "Edit Product";
+            let res = await fetch(API_BASE_URL+'/admin/products/'+id,{headers:{'Authorization':'Bearer '+ADMIN_TOKEN}});
+            let prod = await res.json();
+            document.getElementById('productId').value = prod.id;
+            document.getElementById('prodName').value = prod.name;
+            document.getElementById('prodDesc').value = prod.description;
+            document.getElementById('prodCategory').value = prod.category;
+            document.getElementById('prodPrice').value = prod.price;
+            document.getElementById('prodQty').value = prod.stockQty;
+            document.getElementById('prodGenderTag').value = prod.genderTag;
+            document.getElementById('prodImage').value = prod.imageUrl||"";
+        }
+        async function submitProduct(event) {
+            event.preventDefault();
+            let id = document.getElementById('productId').value;
+            let body = {
+                name: document.getElementById('prodName').value,
+                description: document.getElementById('prodDesc').value,
+                category: document.getElementById('prodCategory').value,
+                price: parseFloat(document.getElementById('prodPrice').value),
+                stockQty: parseInt(document.getElementById('prodQty').value),
+                genderTag: document.getElementById('prodGenderTag').value,
+                imageUrl: document.getElementById('prodImage').value
+            };
+            let url = API_BASE_URL+'/admin/products' + (id ? '/'+id : '');
+            let method = id ? "PUT" : "POST";
+            let res = await fetch(url, {
+                method: method,
+                headers: { 'Authorization':'Bearer '+ADMIN_TOKEN, 'Content-Type':'application/json' },
+                body: JSON.stringify(body)
+            });
+            if (res.ok) {
+                closeProductModal();
+                listProducts();
+                fetchAdminStats();
+            }
+        }
+        // --- ORDERS ---
+        async function listOrders() {
+            let tb = document.getElementById("ordersTable").querySelector('tbody');
+            tb.innerHTML = `<tr><td colspan="5">Loading...</td></tr>`;
+            let res = await fetch(API_BASE_URL+'/admin/orders',{headers:{'Authorization':'Bearer '+ADMIN_TOKEN}});
+            let orders = await res.json();
+            tb.innerHTML = orders.map(order => `
+                <tr>
+                    <td>${order.id}</td>
+                    <td>${order.user ? order.user.email : "--"}</td>
+                    <td>₹${order.totalAmount || 0}</td>
+                    <td>${order.status}</td>
+                    <td>${order.createdAt ? new Date(order.createdAt).toLocaleDateString() : ""}</td>
+                </tr>
+            `).join('');
+        }
+        // --- USERS ---
+        async function listUsers() {
+            let tb = document.getElementById("usersTable").querySelector('tbody');
+            tb.innerHTML = `<tr><td colspan="5">Loading...</td></tr>`;
+            let res = await fetch(API_BASE_URL+'/admin/users',{headers:{'Authorization':'Bearer '+ADMIN_TOKEN}});
+            let users = await res.json();
+            tb.innerHTML = users.map(user => `
+                <tr>
+                    <td>${user.id}</td>
+                    <td>${user.name}</td>
+                    <td>${user.email}</td>
+                    <td>${user.role}</td>
+                    <td>${user.createdAt ? new Date(user.createdAt).toLocaleDateString() : ""}</td>
+                </tr>
+            `).join('');
+        }
+    </script>
+</body>
+</html>
