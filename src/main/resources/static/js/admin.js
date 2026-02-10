@@ -28,19 +28,45 @@ function showSection(section, el) {
     });
     document.querySelectorAll('.sidebar-links a').forEach(link=>link.classList.remove('active'));
     if(el) el.classList.add('active');
+    // Refresh data when switching sections
+    if(section==='dashboard') fetchAdminStats();
     if(section==='products') listProducts();
     if(section==='orders') listOrders();
     if(section==='users') listUsers();
+    if(section==='analytics') fetchAnalytics();
 }
 
 // --- DASHBOARD DATA ---
 async function fetchAdminStats() {
+    // initialize defaults so UI doesn't show placeholders for long
+    try {
+        document.getElementById('statProducts').innerText = '0';
+        document.getElementById('statUsers').innerText = '0';
+        document.getElementById('statOrders').innerText = '0';
+        document.getElementById('statSales').innerText = '₹0.00';
+    } catch (e) {
+        // ignore if elements missing
+    }
+
     try {
         let [productsRes, usersRes, ordersRes] = await Promise.all([
             fetch(API_BASE_URL+'/admin/products',{headers:{'Authorization':'Bearer '+ADMIN_TOKEN}}),
             fetch(API_BASE_URL+'/admin/users',{headers:{'Authorization':'Bearer '+ADMIN_TOKEN}}),
             fetch(API_BASE_URL+'/admin/orders',{headers:{'Authorization':'Bearer '+ADMIN_TOKEN}})
         ]);
+        if (!productsRes.ok || !usersRes.ok || !ordersRes.ok) {
+            // fallback to aggregated stats endpoint
+            const statsRes = await fetch(API_BASE_URL + '/admin/stats', { headers: { 'Authorization': 'Bearer ' + ADMIN_TOKEN } });
+            if (statsRes.ok) {
+                const s = await statsRes.json();
+                document.getElementById('statProducts').innerText = s.totalProducts || 0;
+                document.getElementById('statUsers').innerText = s.totalUsers || 0;
+                document.getElementById('statOrders').innerText = s.totalOrders || 0;
+                document.getElementById('statSales').innerText = '₹' + (s.totalRevenue ? parseFloat(s.totalRevenue).toFixed(2) : '0.00');
+                return;
+            }
+        }
+
         let products = await productsRes.json();
         let users = await usersRes.json();
         let orders = await ordersRes.json();
@@ -51,6 +77,19 @@ async function fetchAdminStats() {
         document.getElementById('statSales').innerText = "₹"+sales.toFixed(2);
     } catch (error) {
         console.error('Error fetching admin stats:', error);
+        // final fallback to aggregated endpoint
+        try {
+            const statsRes = await fetch(API_BASE_URL + '/admin/stats', { headers: { 'Authorization': 'Bearer ' + ADMIN_TOKEN } });
+            if (statsRes.ok) {
+                const s = await statsRes.json();
+                document.getElementById('statProducts').innerText = s.totalProducts || 0;
+                document.getElementById('statUsers').innerText = s.totalUsers || 0;
+                document.getElementById('statOrders').innerText = s.totalOrders || 0;
+                document.getElementById('statSales').innerText = '₹' + (s.totalRevenue ? parseFloat(s.totalRevenue).toFixed(2) : '0.00');
+            }
+        } catch (e) {
+            console.error('Fallback stats failed:', e);
+        }
     }
 }
 
@@ -145,18 +184,65 @@ async function submitProduct(event) {
 // --- ORDERS ---
 async function listOrders() {
     let tb = document.getElementById("ordersTable").querySelector('tbody');
-    tb.innerHTML = `<tr><td colspan="5">Loading...</td></tr>`;
+    tb.innerHTML = `<tr><td colspan="7">Loading...</td></tr>`;
     let res = await fetch(API_BASE_URL+'/admin/orders',{headers:{'Authorization':'Bearer '+ADMIN_TOKEN}});
     let orders = await res.json();
-    tb.innerHTML = orders.map(order => `
-        <tr>
-            <td>${order.id}</td>
-            <td>${order.user ? order.user.email : "--"}</td>
-            <td>₹${order.totalAmount || 0}</td>
-            <td>${order.status}</td>
-            <td>${order.createdAt ? new Date(order.createdAt).toLocaleDateString() : ""}</td>
-        </tr>
-    `).join('');
+    tb.innerHTML = orders.map(order => {
+        // Determine payment badge class
+        let paymentStatus = order.paymentStatus || "PENDING";
+        let badgeClass = "pending";
+        if (paymentStatus === "PAID") badgeClass = "paid";
+        else if (paymentStatus === "FAILED") badgeClass = "failed";
+        
+        return `
+            <tr>
+                <td>${order.id}</td>
+                <td>${order.user ? order.user.email : "--"}</td>
+                <td>₹${order.totalAmount || 0}</td>
+                <td>${order.status}</td>
+                <td><span class="payment-badge ${badgeClass}">${paymentStatus}</span></td>
+                <td>${order.paymentId || "--"}</td>
+                <td>${order.createdAt ? new Date(order.createdAt).toLocaleDateString() : ""}</td>
+            </tr>
+        `;
+    }).join('');
+}
+
+// --- ANALYTICS ---
+async function fetchAnalytics() {
+    const container = document.getElementById('analyticsContent');
+    if (!container) return;
+    container.innerHTML = 'Loading analytics...';
+
+    try {
+        const res = await fetch(API_BASE_URL + '/admin/stats', { headers: { 'Authorization': 'Bearer ' + ADMIN_TOKEN } });
+        if (!res.ok) throw new Error('Failed to fetch analytics');
+        const s = await res.json();
+        container.innerHTML = `
+            <div style="display:flex;gap:20px;flex-wrap:wrap">
+                <div style="min-width:180px;background:#fff;padding:18px;border-radius:8px;box-shadow:0 2px 8px #0001">
+                    <div style="font-size:14px;color:#888">Total Orders</div>
+                    <div style="font-size:20px;font-weight:700">${s.totalOrders || 0}</div>
+                </div>
+                <div style="min-width:180px;background:#fff;padding:18px;border-radius:8px;box-shadow:0 2px 8px #0001">
+                    <div style="font-size:14px;color:#888">Total Revenue</div>
+                    <div style="font-size:20px;font-weight:700">₹${s.totalRevenue ? parseFloat(s.totalRevenue).toFixed(2) : '0.00'}</div>
+                </div>
+                <div style="min-width:180px;background:#fff;padding:18px;border-radius:8px;box-shadow:0 2px 8px #0001">
+                    <div style="font-size:14px;color:#888">Products</div>
+                    <div style="font-size:20px;font-weight:700">${s.totalProducts || 0}</div>
+                </div>
+                <div style="min-width:180px;background:#fff;padding:18px;border-radius:8px;box-shadow:0 2px 8px #0001">
+                    <div style="font-size:14px;color:#888">Users</div>
+                    <div style="font-size:20px;font-weight:700">${s.totalUsers || 0}</div>
+                </div>
+            </div>
+            <p style="margin-top:18px;color:#666">(Simple analytics summary — more charts can be added later.)</p>
+        `;
+    } catch (err) {
+        console.error('Error loading analytics', err);
+        container.innerHTML = '<div class="section-desc">Failed to load analytics.</div>';
+    }
 }
 
 // --- USERS ---

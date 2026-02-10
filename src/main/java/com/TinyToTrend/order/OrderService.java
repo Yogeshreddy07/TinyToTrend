@@ -97,4 +97,91 @@ public class OrderService {
     public List<Order> getOrdersByStatus(String status) {
         return orderRepository.findByStatus(status);
     }
+
+    /**
+     * Create an order for Razorpay payment flow.
+     * Order is created with CREATED status and PENDING payment status.
+     * Cart items are converted to order items but cart is NOT cleared yet.
+     */
+    @Transactional
+    public Order createOrderForPayment(String email, String shippingAddress) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        List<CartItem> cartItems = cartItemRepository.findByUserId(user.getId());
+        
+        if (cartItems.isEmpty()) {
+            throw new RuntimeException("Cart is empty");
+        }
+        
+        BigDecimal total = cartItems.stream()
+                .map(item -> item.getProduct().getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        
+        Order order = new Order(user, total, shippingAddress, "RAZORPAY");
+        order.setStatus("CREATED");
+        order.setPaymentStatus("PENDING");
+        
+        for (CartItem cartItem : cartItems) {
+            OrderItem orderItem = new OrderItem(
+                    order,
+                    cartItem.getProduct(),
+                    cartItem.getQuantity(),
+                    cartItem.getProduct().getPrice()
+            );
+            order.addItem(orderItem);
+        }
+        
+        order = orderRepository.save(order);
+        
+        // Clear cart after order is created
+        cartItemRepository.deleteByUserId(user.getId());
+        
+        return order;
+    }
+
+    /**
+     * Update the Razorpay order ID for an order.
+     */
+    @Transactional
+    public Order updateRazorpayOrderId(Long orderId, String razorpayOrderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+        
+        order.setRazorpayOrderId(razorpayOrderId);
+        order.setUpdatedAt(LocalDateTime.now());
+        
+        return orderRepository.save(order);
+    }
+
+    /**
+     * Mark an order as paid after successful payment verification.
+     */
+    @Transactional
+    public Order markOrderAsPaid(Long orderId, String paymentId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+        
+        order.setPaymentId(paymentId);
+        order.setPaymentStatus("PAID");
+        order.setStatus("CONFIRMED");
+        order.setUpdatedAt(LocalDateTime.now());
+        
+        return orderRepository.save(order);
+    }
+
+    /**
+     * Mark an order as failed after payment verification failure.
+     */
+    @Transactional
+    public Order markOrderAsFailed(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+        
+        order.setPaymentStatus("FAILED");
+        order.setStatus("PAYMENT_FAILED");
+        order.setUpdatedAt(LocalDateTime.now());
+        
+        return orderRepository.save(order);
+    }
 }

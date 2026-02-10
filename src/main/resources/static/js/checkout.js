@@ -1,15 +1,22 @@
 /**
  * Checkout Page JavaScript for TinyToTrend
- * Handles checkout form and order placement
+ * Handles checkout form and Razorpay payment integration
  */
 
 let token = localStorage.getItem("token");
 let userName = localStorage.getItem("userName") || "Profile";
+let userEmail = localStorage.getItem("userEmail") || "";
 let subtotal = 0;
 
 // Initialize on page load
 document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("navUserName").textContent = userName;
+    
+    // Pre-fill name if available
+    if (userName && userName !== "Profile") {
+        document.getElementById("name").value = userName;
+    }
+    
     fetchCartAndShowSummary();
 });
 
@@ -52,42 +59,170 @@ async function fetchCartAndShowSummary() {
     }
 }
 
-// Place order API
+// Place order with Razorpay payment
 async function placeOrder(e) {
     e.preventDefault();
+    
     const name = document.getElementById("name").value.trim();
     const address = document.getElementById("address").value.trim();
     const mobile = document.getElementById("mobile").value.trim();
-    if (!name || !address || !mobile) return;
+    
+    if (!name || !address || !mobile) {
+        showOrderError("Please fill in all required fields");
+        return;
+    }
+    
     const orderBtn = document.getElementById("orderBtn");
     orderBtn.disabled = true;
-    orderBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Placing...';
+    orderBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
     document.getElementById("orderStatus").innerHTML = "";
 
     try {
-        // Place order POST /api/orders
-        const res = await fetch(API_BASE_URL + "/orders", {
+        // Step 1: Create payment order on backend
+        const shippingAddress = `${name}\n${address}\nMobile: ${mobile}`;
+        
+        const createOrderRes = await fetch(API_BASE_URL + "/orders/create-payment-order", {
+            method: "POST",
+            headers: {
+                "Authorization": "Bearer " + token,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ shippingAddress })
+        });
+        
+        if (!createOrderRes.ok) {
+            const errorData = await createOrderRes.json();
+            throw new Error(errorData.error || "Failed to create order");
+        }
+        
+        const orderData = await createOrderRes.json();
+        
+        // Step 2: Open Razorpay checkout popup
+        openRazorpayCheckout(orderData, name, mobile);
+        
+    } catch (err) {
+        console.error("Order creation error:", err);
+        showOrderError(err.message || "Failed to create order. Please try again.");
+        orderBtn.disabled = false;
+        orderBtn.innerHTML = 'PLACE ORDER';
+    }
+}
+
+/**
+ * Open Razorpay checkout popup
+ */
+function openRazorpayCheckout(orderData, customerName, customerMobile) {
+    const options = {
+        key: orderData.key,
+        amount: orderData.amount,
+        currency: orderData.currency || "INR",
+        name: "TinyToTrend",
+        description: "Order #" + orderData.orderId,
+        order_id: orderData.razorpayOrderId,
+        prefill: {
+            name: customerName,
+            email: userEmail,
+            contact: customerMobile
+        },
+        theme: {
+            color: "#ff3f6c"
+        },
+        handler: function(response) {
+            // Payment successful - verify on backend
+            verifyPayment(orderData.orderId, response);
+        },
+        modal: {
+            ondismiss: function() {
+                // User closed the popup without completing payment
+                showOrderError("Payment cancelled. Your order is pending.");
+                resetOrderButton();
+            }
+        }
+    };
+    
+    const razorpay = new Razorpay(options);
+    
+    razorpay.on('payment.failed', function(response) {
+        console.error("Payment failed:", response.error);
+        showOrderError(`Payment failed: ${response.error.description}`);
+        resetOrderButton();
+    });
+    
+    razorpay.open();
+}
+
+/**
+ * Verify payment with backend after successful Razorpay payment
+ */
+async function verifyPayment(orderId, razorpayResponse) {
+    const orderBtn = document.getElementById("orderBtn");
+    orderBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying payment...';
+    
+    try {
+        const verifyRes = await fetch(API_BASE_URL + "/orders/verify-payment", {
             method: "POST",
             headers: {
                 "Authorization": "Bearer " + token,
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                shippingAddress: address,
-                mobile
+                orderId: orderId.toString(),
+                razorpayOrderId: razorpayResponse.razorpay_order_id,
+                razorpayPaymentId: razorpayResponse.razorpay_payment_id,
+                razorpaySignature: razorpayResponse.razorpay_signature
             })
         });
-        if (!res.ok) throw new Error("Server error");
-        const data = await res.json();
-        document.getElementById("orderStatus").innerHTML =
-            `<div class="order-status-success"><i class="fas fa-check-circle"></i> Order placed successfully! <br>Your Order ID: <b>${data.orderId || ""}</b> <br><br><a href="/orders.html" style="color:var(--white);text-decoration:underline;">View Orders</a></div>`;
-        orderBtn.style.display = "none";
-        // Optionally, clear form
-        document.getElementById("checkoutForm").reset();
+        
+        const verifyData = await verifyRes.json();
+        
+        if (verifyRes.ok && verifyData.success) {
+            // Payment verified successfully
+            showOrderSuccess(orderId, razorpayResponse.razorpay_payment_id);
+        } else {
+            throw new Error(verifyData.error || "Payment verification failed");
+        }
+        
     } catch (err) {
-        document.getElementById("orderStatus").innerHTML =
-            `<div class="order-status-fail"><i class="fas fa-exclamation-triangle"></i> Failed to place order. Please try again.</div>`;
-        orderBtn.disabled = false;
-        orderBtn.innerHTML = 'PLACE ORDER';
+        console.error("Payment verification error:", err);
+        showOrderError("Payment verification failed. Please contact support with Order ID: " + orderId);
+        resetOrderButton();
     }
+}
+
+/**
+ * Show success message after successful payment
+ */
+function showOrderSuccess(orderId, paymentId) {
+    document.getElementById("orderStatus").innerHTML = `
+        <div class="order-status-success">
+            <i class="fas fa-check-circle"></i> Payment Successful!
+            <br><br>
+            <strong>Order ID:</strong> ${orderId}<br>
+            <strong>Payment ID:</strong> ${paymentId}
+            <br><br>
+            <a href="/profile.html" style="color:var(--white);text-decoration:underline;">View My Orders</a>
+        </div>
+    `;
+    document.getElementById("orderBtn").style.display = "none";
+    document.getElementById("checkoutForm").reset();
+}
+
+/**
+ * Show error message
+ */
+function showOrderError(message) {
+    document.getElementById("orderStatus").innerHTML = `
+        <div class="order-status-fail">
+            <i class="fas fa-exclamation-triangle"></i> ${message}
+        </div>
+    `;
+}
+
+/**
+ * Reset order button to initial state
+ */
+function resetOrderButton() {
+    const orderBtn = document.getElementById("orderBtn");
+    orderBtn.disabled = false;
+    orderBtn.innerHTML = 'PLACE ORDER';
 }

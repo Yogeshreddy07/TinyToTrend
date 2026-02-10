@@ -48,13 +48,19 @@
             width: 240px;
             background: var(--white);
             border-right: 1px solid var(--border-color);
-            padding: 40px 0 40px 0;
+            /* Reduced vertical padding to tighten layout */
+            padding: 18px 0 18px 0;
             box-shadow: 2px 0 6px #d0d0d03a;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start; /* Start items at top for tighter look */
+            align-items: stretch;
         }
         .sidebar h3 {
             text-align: center;
             color: var(--primary-color);
-            margin-bottom: 32px;
+            margin-bottom: 12px; /* reduced spacing */
+            font-size: 18px;
         }
         .sidebar-links {
             list-style: none;
@@ -66,7 +72,8 @@
         .sidebar-links a {
             display: block;
             color: var(--secondary-color);
-            padding: 13px 38px;
+            /* compact link padding to reduce gaps */
+            padding: 10px 22px;
             text-decoration: none;
             font-weight: 500;
             border-left: 4px solid transparent;
@@ -83,9 +90,10 @@
         }
         .logout-link {
             display: block;
-            margin: 35px auto 0;
+            /* bring logout closer to settings */
+            margin: 12px auto 0;
             width: 85%;
-            padding: 12px 0;
+            padding: 10px 0;
             background: var(--error);
             color: var(--white);
             border: none;
@@ -172,6 +180,25 @@
         .action-btn.delete {
             background: var(--error);
         }
+        .payment-badge {
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .payment-badge.paid {
+            background: #d4edda;
+            color: #155724;
+        }
+        .payment-badge.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .payment-badge.failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
         .add-btn {
             background: var(--primary-color);
             color: var(--white);
@@ -229,7 +256,6 @@
     <div class="navbar">
         <div class="container">
             <span>TinyToTrend Admin Dashboard</span>
-            <a class="logout-link" href="#" onclick="logout();">Logout <i class="fas fa-sign-out-alt"></i></a>
         </div>
     </div>
     <div class="dashboard-layout">
@@ -243,6 +269,7 @@
                 <li><a href="#" onclick="showSection('analytics',this)"><i class="fas fa-chart-line"></i> Analytics</a></li>
                 <li><a href="#" onclick="showSection('settings',this)"><i class="fas fa-cog"></i> Settings</a></li>
             </ul>
+            <a class="logout-link" href="#" onclick="logout();">Logout <i class="fas fa-sign-out-alt"></i></a>
         </nav>
         <main class="main">
             <!-- Dashboard -->
@@ -250,22 +277,22 @@
                 <div class="dashboard-cards">
                     <div class="dash-card">
                         <i class="fas fa-tshirt"></i>
-                        <h2 id="statProducts">--</h2>
+                        <h2 id="statProducts">0</h2>
                         <span>Products</span>
                     </div>
                     <div class="dash-card">
                         <i class="fas fa-users"></i>
-                        <h2 id="statUsers">--</h2>
+                        <h2 id="statUsers">0</h2>
                         <span>Users</span>
                     </div>
                     <div class="dash-card">
                         <i class="fas fa-shopping-cart"></i>
-                        <h2 id="statOrders">--</h2>
+                        <h2 id="statOrders">0</h2>
                         <span>Orders</span>
                     </div>
                     <div class="dash-card">
                         <i class="fas fa-rupee-sign"></i>
-                        <h2 id="statSales">--</h2>
+                        <h2 id="statSales">₹0.00</h2>
                         <span>Total Sales</span>
                     </div>
                 </div>
@@ -305,6 +332,8 @@
                             <th>User</th>
                             <th>Total</th>
                             <th>Status</th>
+                            <th>Payment Status</th>
+                            <th>Payment ID</th>
                             <th>Date</th>
                         </tr>
                     </thead>
@@ -334,7 +363,7 @@
             </div>
             <div id="analyticsSection" style="display:none;">
                 <h2 class="section-title">Analytics</h2>
-                <div class="section-desc">(Analytics features coming soon! Add charts here.)</div>
+                <div id="analyticsContent" class="section-desc">Loading analytics...</div>
             </div>
             <div id="settingsSection" style="display:none;">
                 <h2 class="section-title">Settings</h2>

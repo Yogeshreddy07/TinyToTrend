@@ -9,6 +9,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "orders")
+@com.fasterxml.jackson.annotation.JsonIgnoreProperties({"hibernateLazyInitializer","handler"})
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,6 +30,15 @@ public class Order {
     
     @Column(name = "payment_method")
     private String paymentMethod;
+    
+    @Column(name = "payment_id")
+    private String paymentId;
+    
+    @Column(name = "razorpay_order_id")
+    private String razorpayOrderId;
+    
+    @Column(name = "payment_status")
+    private String paymentStatus = "PENDING";
     
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
@@ -60,6 +70,12 @@ public class Order {
     public void setShippingAddress(String shippingAddress) { this.shippingAddress = shippingAddress; }
     public String getPaymentMethod() { return paymentMethod; }
     public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }
+    public String getPaymentId() { return paymentId; }
+    public void setPaymentId(String paymentId) { this.paymentId = paymentId; }
+    public String getRazorpayOrderId() { return razorpayOrderId; }
+    public void setRazorpayOrderId(String razorpayOrderId) { this.razorpayOrderId = razorpayOrderId; }
+    public String getPaymentStatus() { return paymentStatus; }
+    public void setPaymentStatus(String paymentStatus) { this.paymentStatus = paymentStatus; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }

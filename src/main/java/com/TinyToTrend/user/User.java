@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "users")
+@com.fasterxml.jackson.annotation.JsonIgnoreProperties({"hibernateLazyInitializer","handler"})
 @Data
 public class User {
     @Id
@@ -18,6 +19,8 @@ public class User {
     @Column(unique = true, nullable = false)
     private String email;
     
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    @lombok.ToString.Exclude
     @Column(nullable = false)
     private String password;
     
