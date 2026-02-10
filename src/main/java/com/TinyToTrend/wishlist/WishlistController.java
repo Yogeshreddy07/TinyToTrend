@@ -36,7 +36,7 @@ public class WishlistController {
         return ResponseEntity.ok(wishlist);
     }
     
-    @PostMapping("/add")
+    @PostMapping
     public ResponseEntity<?> addToWishlist(
             Authentication authentication,
             @RequestBody Map<String, Object> request) {
@@ -57,25 +57,32 @@ public class WishlistController {
             Wishlist wishlist = new Wishlist(user, product);
             wishlistRepository.save(wishlist);
             
-            return ResponseEntity.ok(Map.of("message", "Product added to wishlist"));
+            return ResponseEntity.ok(Map.of("message", "Product added to wishlist", "id", wishlist.getId()));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
     
-    @DeleteMapping("/{productId}")
+    @DeleteMapping("/{wishlistId}")
     @Transactional
     public ResponseEntity<?> removeFromWishlist(
             Authentication authentication,
-            @PathVariable Long productId) {
+            @PathVariable Long wishlistId) {
         
         try {
             String email = authentication.getName();
             User user = userRepository.findByEmail(email)
                     .orElseThrow(() -> new RuntimeException("User not found"));
             
-            wishlistRepository.deleteByUserIdAndProductId(user.getId(), productId);
-            return ResponseEntity.ok(Map.of("message", "Product removed from wishlist"));
+            Wishlist wishlist = wishlistRepository.findById(wishlistId)
+                    .orElseThrow(() -> new RuntimeException("Wishlist item not found"));
+            
+            if (!wishlist.getUser().getId().equals(user.getId())) {
+                return ResponseEntity.status(403).body(Map.of("error", "Not authorized to delete this item"));
+            }
+            
+            wishlistRepository.deleteById(wishlistId);
+            return ResponseEntity.ok(Map.of("message", "Wishlist item removed"));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }

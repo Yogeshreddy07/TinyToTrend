@@ -63,7 +63,19 @@ public class AdminController {
     }
     
     // Product Management
-    @PostMapping("/products")
+    @GetMapping("/products")
+    public ResponseEntity<List<Product>> getAllProductsAdmin() {
+        List<Product> products = productService.getAllProducts();
+        return ResponseEntity.ok(products);
+    }
+
+    @GetMapping("/products/{id}")
+    public ResponseEntity<Product> getProductByIdAdmin(@PathVariable Long id) {
+        Product product = productService.getProductById(id);
+        return ResponseEntity.ok(product);
+    }
+
+    @PostMapping(value = "/products", consumes = "multipart/form-data")
     public ResponseEntity<?> createProduct(
             @RequestParam("name") String name,
             @RequestParam("description") String description,
@@ -81,8 +93,19 @@ public class AdminController {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
+
+    // Accept JSON payloads from admin UI
+    @PostMapping(value = "/products", consumes = "application/json")
+    public ResponseEntity<?> createProductJson(@RequestBody ProductDTO dto) {
+        try {
+            Product product = productService.createProduct(dto, null);
+            return ResponseEntity.ok(product);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
     
-    @PutMapping("/products/{id}")
+    @PutMapping(value = "/products/{id}", consumes = "multipart/form-data")
     public ResponseEntity<?> updateProduct(
             @PathVariable Long id,
             @RequestParam("name") String name,
@@ -96,6 +119,16 @@ public class AdminController {
         try {
             ProductDTO dto = new ProductDTO(name, description, price, category, genderTag, stockQty);
             Product product = productService.updateProduct(id, dto, image);
+            return ResponseEntity.ok(product);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @PutMapping(value = "/products/{id}", consumes = "application/json")
+    public ResponseEntity<?> updateProductJson(@PathVariable Long id, @RequestBody ProductDTO dto) {
+        try {
+            Product product = productService.updateProduct(id, dto, null);
             return ResponseEntity.ok(product);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));

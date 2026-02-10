@@ -263,6 +263,74 @@
             margin-bottom: 40px;
         }
 
+        /* ==================== FILTER BAR ==================== */
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: var(--white);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+
+        .filter-bar label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-dark);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .filter-bar select {
+            padding: 10px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 14px;
+            background: var(--white);
+            color: var(--text-dark);
+            cursor: pointer;
+            min-width: 150px;
+            transition: all 0.3s;
+        }
+
+        .filter-bar select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(255,63,108,0.1);
+        }
+
+        .filter-bar select:hover {
+            border-color: var(--primary-color);
+        }
+
+        .clear-filters-btn {
+            padding: 10px 20px;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            color: var(--text-dark);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-left: auto;
+        }
+
+        .clear-filters-btn:hover {
+            background: var(--primary-color);
+            color: var(--white);
+            border-color: var(--primary-color);
+        }
+
         .products-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -339,6 +407,45 @@
 
         .add-to-bag:hover {
             background: #e63462;
+        }
+
+        /* ==================== LOAD MORE ==================== */
+        .load-more-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 40px;
+            padding: 20px 0;
+        }
+
+        .load-more-btn {
+            padding: 15px 50px;
+            background: var(--white);
+            border: 2px solid var(--primary-color);
+            border-radius: 4px;
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+        }
+
+        .load-more-btn:hover {
+            background: var(--primary-color);
+            color: var(--white);
+        }
+
+        .load-more-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: var(--bg-light);
+            border-color: var(--border-color);
+            color: var(--text-light);
+        }
+
+        .load-more-btn.loading {
+            pointer-events: none;
         }
 
         /* ==================== BUTTONS ==================== */
@@ -499,6 +606,24 @@
                 grid-template-columns: repeat(2, 1fr);
             }
             
+            .filter-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .filter-group {
+                width: 100%;
+            }
+            
+            .filter-bar select {
+                width: 100%;
+            }
+            
+            .clear-filters-btn {
+                margin-left: 0;
+                width: 100%;
+            }
+            
             .hero-content h1 {
                 font-size: 36px;
             }
@@ -608,11 +733,45 @@
                 <h2 class="section-title">Trending Now</h2>
             </div>
             
+            <!-- Filter Bar -->
+            <div class="filter-bar">
+                <div class="filter-group">
+                    <label for="categoryFilter">Category</label>
+                    <select id="categoryFilter">
+                        <option value="">All Categories</option>
+                        <option value="men">Men</option>
+                        <option value="women">Women</option>
+                        <option value="boys">Boys</option>
+                        <option value="girls">Girls</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="sortFilter">Sort By</label>
+                    <select id="sortFilter">
+                        <option value="">Default</option>
+                        <option value="priceAsc">Price: Low to High</option>
+                        <option value="priceDesc">Price: High to Low</option>
+                    </select>
+                </div>
+                
+                <button class="clear-filters-btn" onclick="clearFilters()">
+                    <i class="fas fa-times"></i> Clear Filters
+                </button>
+            </div>
+            
             <div class="products-grid" id="productsGrid">
                 <div class="loading">
                     <i class="fas fa-spinner fa-spin"></i>
                     <p>Loading products...</p>
                 </div>
+            </div>
+            
+            <!-- Load More Button -->
+            <div class="load-more-container" id="loadMoreContainer" style="display: none;">
+                <button class="load-more-btn" id="loadMoreBtn" onclick="loadMoreProducts()">
+                    <i class="fas fa-plus"></i> Load More Products
+                </button>
             </div>
         </div>
     </section>

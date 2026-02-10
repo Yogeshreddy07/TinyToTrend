@@ -22,6 +22,23 @@ public class CartController {
         return ResponseEntity.ok(cartItems);
     }
     
+    @PostMapping
+    public ResponseEntity<?> addToCartDirect(
+            Authentication authentication,
+            @RequestBody Map<String, Object> request) {
+        
+        try {
+            String email = authentication.getName();
+            Long productId = Long.valueOf(request.get("productId").toString());
+            Integer quantity = Integer.valueOf(request.get("quantity").toString());
+            
+            CartItem item = cartService.addToCart(email, productId, quantity);
+            return ResponseEntity.ok(item);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
     @PostMapping("/add")
     public ResponseEntity<?> addToCart(
             Authentication authentication,

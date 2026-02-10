@@ -48,8 +48,9 @@ public class SecurityConfig {
                 // Public product APIs
                 .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
                 
-                // Admin endpoints - require ADMIN role
-                .requestMatchers("/admin/**").hasRole("ADMIN")
+                // Admin pages: allow GET so the browser can load the dashboard HTML (client-side JS enforces auth)
+                .requestMatchers(HttpMethod.GET, "/admin/**").permitAll()
+                // Admin APIs: require ADMIN role
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 
                 // Protected API endpoints - require authentication

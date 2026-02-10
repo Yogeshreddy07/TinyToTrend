@@ -1,6 +1,9 @@
 package com.tinytotrend.product;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,6 +29,64 @@ public class ProductService {
     
     public List<Product> getProducts(String category, String gender, String search) {
         return productRepository.findWithFilters(category, gender, search);
+    }
+    
+    /**
+     * Get products with optional search, filter, and sort parameters.
+     * All parameters are optional - if null/empty, they are ignored.
+     * This maintains backward compatibility with existing functionality.
+     * 
+     * @param category Filter by category (optional)
+     * @param gender Filter by gender tag (optional)
+     * @param search Search by product name - case insensitive (optional)
+     * @param sort Sort order: "priceAsc", "priceDesc", or null for default (optional)
+     * @return List of products matching the criteria
+     */
+    public List<Product> getProductsWithSort(String category, String gender, String search, String sort) {
+        // Normalize empty strings to null for consistent query behavior
+        String normalizedCategory = (category != null && !category.isEmpty()) ? category : null;
+        String normalizedGender = (gender != null && !gender.isEmpty()) ? gender : null;
+        String normalizedSearch = (search != null && !search.isEmpty()) ? search : null;
+        
+        // Apply sorting based on sort parameter
+        if ("priceAsc".equalsIgnoreCase(sort)) {
+            return productRepository.findWithFiltersSortByPriceAsc(normalizedCategory, normalizedGender, normalizedSearch);
+        } else if ("priceDesc".equalsIgnoreCase(sort)) {
+            return productRepository.findWithFiltersSortByPriceDesc(normalizedCategory, normalizedGender, normalizedSearch);
+        } else {
+            // Default: no sorting (or use existing method)
+            return productRepository.findWithFilters(normalizedCategory, normalizedGender, normalizedSearch);
+        }
+    }
+    
+    /**
+     * Get products with pagination support.
+     * 
+     * @param category Filter by category (optional)
+     * @param gender Filter by gender tag (optional)
+     * @param search Search by product name - case insensitive (optional)
+     * @param sort Sort order: "priceAsc", "priceDesc", or null for default (optional)
+     * @param page Page number (0-indexed)
+     * @param size Number of items per page
+     * @return Page of products matching the criteria
+     */
+    public Page<Product> getProductsPaged(String category, String gender, String search, String sort, int page, int size) {
+        // Normalize empty strings to null for consistent query behavior
+        String normalizedCategory = (category != null && !category.isEmpty()) ? category : null;
+        String normalizedGender = (gender != null && !gender.isEmpty()) ? gender : null;
+        String normalizedSearch = (search != null && !search.isEmpty()) ? search : null;
+        
+        Pageable pageable = PageRequest.of(page, size);
+        
+        // Apply sorting based on sort parameter
+        if ("priceAsc".equalsIgnoreCase(sort)) {
+            return productRepository.findWithFiltersSortByPriceAscPaged(normalizedCategory, normalizedGender, normalizedSearch, pageable);
+        } else if ("priceDesc".equalsIgnoreCase(sort)) {
+            return productRepository.findWithFiltersSortByPriceDescPaged(normalizedCategory, normalizedGender, normalizedSearch, pageable);
+        } else {
+            // Default: no sorting
+            return productRepository.findWithFiltersPaged(normalizedCategory, normalizedGender, normalizedSearch, pageable);
+        }
     }
     
     public Product getProductById(Long id) {
