@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tinytotrend-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: tinytotrend
+  template:
+    metadata:
+      labels:
+        app: tinytotrend
+    spec:
+      containers:
+      - name: tinytotrend
+        image: tinytotrend:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            cpu: "200m"
+          limits:
+            cpu: "500m"
